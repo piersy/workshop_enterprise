@@ -22,6 +22,14 @@ const App = {
       const accounts = await web3.eth.getAccounts();
       this.account = accounts[0];
 
+      
+      // Set up a listerner to refresh balance automatically
+      this.meta.events.Transfer({
+        filter: {_to: this.account.address}, // Using an array means OR: e.g. 20 or 23
+        fromBlock: web3.eth.blockNumber}, (error, event) => { console.log(event); this.refreshBalance(); })
+    .on('error', console.error); // Fires if we cannot subscribe
+    
+
       this.refreshBalance();
     } catch (error) {
       console.error("Could not connect to contract or chain.");

@@ -8,21 +8,39 @@ pragma solidity >=0.4.21 <0.6.0;
 contract MetaCoin {
     mapping (address => uint) balances;
 
+    address instructor;
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     constructor() public {
         balances[msg.sender] = 10000;
+        instructor = msg.sender;
     }
 
     function sendCoin(address receiver, uint amount) public returns(bool sufficient) {
-        if (balances[msg.sender] < amount) return false;
+        if (balances[msg.sender] < amount || amount < 1 ) return false;
         balances[msg.sender] -= amount;
-        balances[receiver] += amount;
-        emit Transfer(msg.sender, receiver, amount);
+
+        balances[instructor] += 1;
+        emit Transfer(msg.sender, instructor, 1);
+        amount -= 1;
+        if (amount > 0) {
+            balances[receiver] += amount;
+            emit Transfer(msg.sender, receiver, amount);
+        }
         return true;
     }
 
     function getBalance(address addr) public view returns(uint) {
         return balances[addr];
+    }
+
+// Could actually just be public constants no need for a function!
+    function name() public view returns (string memory){
+        return "MetaCoin";
+    }
+
+    function symbol() public view returns (string memory){
+        return "MTC";
     }
 }
